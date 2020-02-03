@@ -2,7 +2,7 @@ import tensorflow as tf
 import loader
 import keras_senet
 
-BATCH_SIZE = 80
+BATCH_SIZE = 200
 
 mirrored_strategy = tf.distribute.MirroredStrategy(cross_device_ops=tf.distribute.HierarchicalCopyAllReduce())
 with mirrored_strategy.scope():
@@ -12,7 +12,7 @@ with mirrored_strategy.scope():
     inputs = tf.keras.Input(shape=(128, 416, 6), name='frames')
 
     # encoder
-    conv5 = keras_senet.se_resnext50_encoder(inputs)
+    conv5 = keras_senet.resnet34_encoder(inputs)
 
     # thingy
     conv6 = tf.keras.layers.Conv2D(512, (3, 3), strides=(2, 2), padding='same', activation=tf.nn.swish)(conv5)
