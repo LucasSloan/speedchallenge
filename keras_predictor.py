@@ -1,8 +1,14 @@
 import tensorflow as tf
 import loader
 import keras_senet
+import time
 
 BATCH_SIZE = 200
+
+flags = tf.app.flags
+FLAGS = flags.FLAGS
+
+flags.DEFINE_string("checkpoint_dir", None, "Directory to load model state from to resume training.")
 
 mirrored_strategy = tf.distribute.MirroredStrategy(cross_device_ops=tf.distribute.HierarchicalCopyAllReduce())
 with mirrored_strategy.scope():
@@ -31,4 +37,18 @@ with mirrored_strategy.scope():
 
     model.compile(optimizer=tf.keras.optimizers.Adam(1e-4), loss={'pose': 'mae', 'speed': 'mse'}, loss_weights={'pose': 1.0, 'speed': 0.0})
 
-    model.fit(training_dataset, epochs=30, validation_data=validation_dataset, validation_steps=10798//BATCH_SIZE)
+    if FLAGS.checkpoint_dir:
+        checkpoint_dir = FLAGS.checkpoint_dir
+        print('attempting to load checkpoint from {}'.format(checkpoint_dir))
+        
+        latest = tf.train.latest_checkpoint(checkpoint_dir)
+        model.load_weights(latest)
+    else:
+        checkpoint_dir = 'checkpoints/{}'.format(time.strftime("%m_%d_%y-%H_%M"))
+
+    checkpoint_path = checkpoint_dir + "/cp-{epoch:04d}.ckpt"
+    cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
+                                                    save_weights_only=True,
+                                                    verbose=1)
+
+    model.fit(training_dataset, epochs=30, validation_data=validation_dataset, validation_steps=10798//BATCH_SIZE, callbacks=[cp_callback])
