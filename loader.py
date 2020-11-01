@@ -78,6 +78,7 @@ def cutout(image, pad_size, replace=0):
       image)
   return image
 
+@tf.function
 def parse_record(tfrecord, training):
     proto = tf.io.parse_single_example(tfrecord, image_feature_description)
 
