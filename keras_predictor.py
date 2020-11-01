@@ -3,7 +3,7 @@ import loader
 import keras_senet
 import time
 
-BATCH_SIZE = 200
+BATCH_SIZE = 32
 
 flags = tf.compat.v1.flags
 FLAGS = flags.FLAGS
