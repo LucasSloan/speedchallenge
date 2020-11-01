@@ -10,8 +10,8 @@ FLAGS = flags.FLAGS
 
 flags.DEFINE_string("checkpoint_dir", None, "Directory to load model state from to resume training.")
 
-training_dataset = loader.load_tfrecord("/mnt/Bulk/commaai/monolithic.tfrecord", BATCH_SIZE, True)
-validation_dataset = loader.load_tfrecord("/mnt/Bulk/speedchallenge/monolithic_multi_framerate.tfrecord", BATCH_SIZE, False)
+training_dataset = loader.load_tfrecord("/mnt/e/commaai/monolithic_train.tfrecord", BATCH_SIZE, True)
+# validation_dataset = loader.load_tfrecord("/mnt/Bulk/speedchallenge/monolithic_multi_framerate.tfrecord", BATCH_SIZE, False)
 
 inputs = tf.keras.Input(shape=(128, 416, 6), name='frames')
 
@@ -49,4 +49,5 @@ cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
                                                 save_weights_only=True,
                                                 verbose=1)
 
-model.fit(training_dataset, epochs=30, validation_data=validation_dataset, validation_steps=10798//BATCH_SIZE, callbacks=[cp_callback])
+# model.fit(training_dataset, epochs=30, validation_data=validation_dataset, validation_steps=10798//BATCH_SIZE, callbacks=[cp_callback])
+model.fit(training_dataset, epochs=30, callbacks=[cp_callback])
