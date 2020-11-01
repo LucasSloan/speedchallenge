@@ -51,11 +51,11 @@ def cutout(image, pad_size, replace=0):
   image_width = tf.shape(image)[1]
 
   # Sample the center location in the image where the zero mask will be applied.
-  cutout_center_height = tf.random_uniform(
+  cutout_center_height = tf.random.uniform(
       shape=[], minval=0, maxval=image_height,
       dtype=tf.int32)
 
-  cutout_center_width = tf.random_uniform(
+  cutout_center_width = tf.random.uniform(
       shape=[], minval=0, maxval=image_width,
       dtype=tf.int32)
 
