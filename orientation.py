@@ -29,7 +29,7 @@ def euler2quat(eulers):
        np.sin(gamma / 2) * np.sin(theta / 2) * np.cos(psi / 2)
 
   quats = array([q0, q1, q2, q3]).T
-  for i in xrange(len(quats)):
+  for i in range(len(quats)):
     if quats[i,0] < 0:
       quats[i] = -quats[i]
   return quats.reshape(output_shape)
@@ -44,11 +44,8 @@ def quat2euler(quats):
   quats = np.atleast_2d(quats)
   q0, q1, q2, q3 = quats[:,0], quats[:,1], quats[:,2], quats[:,3]
 
-  # roll
   gamma = np.arctan2(2 * (q0 * q1 + q2 * q3), 1 - 2 * (q1**2 + q2**2))
-  #pitch
   theta = np.arcsin(2 * (q0 * q2 - q3 * q1))
-  # yaw
   psi = np.arctan2(2 * (q0 * q3 + q1 * q2), 1 - 2 * (q2**2 + q3**2))
 
   eulers = array([gamma, theta, psi]).T
