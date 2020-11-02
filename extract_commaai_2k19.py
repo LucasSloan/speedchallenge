@@ -43,8 +43,7 @@ def extract_segment(path):
         ret, frame = cam.read()
 
         if ret:
-            frame = frame[219:-218]
-            frame = cv2.resize(frame, (416, 128), interpolation=cv2.INTER_AREA)
+            frame = cv2.resize(frame, (640, 480), interpolation=cv2.INTER_AREA)
             ret, jpg = cv2.imencode(".jpg", frame)
             if not ret:
                 raise Exception("couldn't encode the image")
