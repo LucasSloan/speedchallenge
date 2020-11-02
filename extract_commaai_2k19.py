@@ -8,6 +8,11 @@ import orientation
 import tensorflow as tf
 import random
 
+flags = tf.compat.v1.flags
+FLAGS = flags.FLAGS
+
+flags.DEFINE_integer("split", None, "Which split of the dataset to work on.")
+
 def _bytes_feature(value):
     return tf.train.Feature(bytes_list=tf.train.BytesList(value=[value]))
 
@@ -85,7 +90,7 @@ def extract_segment(path):
     return examples
 
 def write_tfrecord(dirs, out):
-    with tf.python_io.TFRecordWriter(out) as writer:
+    with tf.io.TFRecordWriter(out) as writer:
         example_buffer = []
         for i, dir in enumerate(dirs):
             example_buffer.extend(extract_segment(dir))
@@ -104,13 +109,21 @@ def write_tfrecord(dirs, out):
             writer.write(e)
 
 
-# segments = glob.glob("/mnt/Bulk/commaai/comma2k19/*/*/*")
+# def write_to_file(dirs, file):
+#     with open(file, "w") as f:
+#         f.write("\n".join(dirs))
+
+# segments = glob.glob("/mnt/d/commaai/comma2k19/*/*/*")
 # random.shuffle(segments)
 
 # train = segments[:1933]
 # validation = segments[1933:]
 
-# write_tfrecord(train, "/mnt/Bulk/commaai/monolithic_train.tfrecord")
-# write_tfrecord(validation, "/mnt/Bulk/commaai/monolithic_validation.tfrecord")
+# write_to_file(train, "2k19_train_split.txt")
+# write_to_file(validation, "2k19_val_split.txt")
 
-# extract_segment("/mnt/d/commaai/comma2k19/Chunk_1/b0c9d2329ad1606b_2018-07-27--06-03-57/3")
+dirs = None
+with open("2k19_train_split.txt") as f:
+    dirs = f.read().splitlines()
+
+write_tfrecord(dirs[FLAGS.split::100], "/mnt/d/commaai/2k19_train/{}.tfrecord".format(FLAGS.split))
