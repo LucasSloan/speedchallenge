@@ -122,12 +122,15 @@ def parse_record(tfrecord, training):
         rev_pose = -1 * pose
         return {'frames': rev_image}, {'pose': rev_pose, 'speed': [speed]}
 
-def load_tfrecord(filename, batch_size, training):
-    dataset = tf.data.TFRecordDataset(filename)
+def load_tfrecord(file_pattern, batch_size, training):
+    dataset = tf.data.Dataset.list_files(file_pattern, shuffle=training)
 
-    if training:
-        dataset = dataset.shuffle(300000)
+    def _prefetch_data(filename):
+        dataset = tf.data.TFRecordDataset(filename).prefetch(1)
+        return dataset
+
+    dataset = dataset.interleave(_prefetch_data, num_parallel_calls=tf.data.experimental.AUTOTUNE)
     dataset = dataset.map(lambda x: parse_record(x, training), num_parallel_calls=tf.data.experimental.AUTOTUNE)
-    dataset = dataset.batch(batch_size)
+    dataset = dataset.batch(batch_size, drop_remainder=True)
     dataset = dataset.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
     return dataset

@@ -1,22 +1,22 @@
 import tensorflow as tf
 import loader
-import keras_senet
+import keras_resnet
 import time
 
-BATCH_SIZE = 32
+BATCH_SIZE = 16
 
 flags = tf.compat.v1.flags
 FLAGS = flags.FLAGS
 
 flags.DEFINE_string("checkpoint_dir", None, "Directory to load model state from to resume training.")
 
-training_dataset = loader.load_tfrecord("/mnt/e/commaai/monolithic_train.tfrecord", BATCH_SIZE, True)
-validation_dataset = loader.load_tfrecord("/mnt/e/commaai/monolithic_validation.tfrecord", BATCH_SIZE, False)
+training_dataset = loader.load_tfrecord("/mnt/e/commaai/2k19_train/*", BATCH_SIZE, True)
+validation_dataset = loader.load_tfrecord("/mnt/e/commaai/2k19_val/*", BATCH_SIZE, False)
 
-inputs = tf.keras.Input(shape=(128, 416, 6), name='frames')
+inputs = tf.keras.Input(shape=(480, 640, 6), name='frames')
 
 # encoder
-conv5 = keras_senet.resnet34_encoder(inputs)
+conv5 = keras_resnet.resnet18_encoder(inputs)
 
 # thingy
 conv6 = tf.keras.layers.Conv2D(512, (3, 3), strides=(2, 2), padding='same', activation=tf.nn.swish)(conv5)
